@@ -27,3 +27,6 @@ run.test
 
 .env
 
+#examples
+passportConfig.js
+

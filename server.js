@@ -12,12 +12,15 @@ const app = express(); //app
 const env = require("dotenv"); //environment var
 const apiRouter = require("./api/index.js"); //api
 const users = require("./routes/usersRoute.js"); //Users
-
 const router = express.Router();
 
 
-//Initialize environment variables
-env.config();
+//Define environment
+if(process.env.NODE_ENV !== "production") env.config();
+
+
+// //Initialize environment variables
+// env.config();
 
 
 //Variables
