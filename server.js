@@ -6,21 +6,14 @@
  *
  */
 
+ //Establish environment
+ if(process.env.NODE_ENV !== "production") require("dotenv").config();
+
 //Dependencies
 const express = require("express"); //express
 const app = express(); //app
-const env = require("dotenv"); //environment var
 const apiRouter = require("./api/index.js"); //api
 const users = require("./routes/usersRoute.js"); //Users
-const router = express.Router();
-
-
-//Define environment
-if(process.env.NODE_ENV !== "production") env.config();
-
-
-// //Initialize environment variables
-// env.config();
 
 
 //Variables
@@ -32,7 +25,7 @@ app.use(express.json());
 
 
 //Route request to the appropriate router
-app.use("/api", apiRouter);
+// app.use("/api", apiRouter);
 app.use("/users", users)
 
 

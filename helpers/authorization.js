@@ -9,7 +9,7 @@
  //Dependencies
  const jwt = require("jsonwebtoken");//JWT
  const fs = require("fs");
- const UserController = require("./../controllers/userController.js");//User controller
+ 
 
  //Variables
  const NOT_AUTH_ROUTE = [
@@ -82,8 +82,8 @@
      * @return {String}
      * Note that token expires after 30 min
      */
-    jwtGenerateToken(payload, options){
-        const token = jwt.sign(payload, process.env.TOKEN_SECRET, options);
+    jwtGenerateToken(payload, secret, options){
+        const token = jwt.sign(payload, secret, options);
         return token;
     }
 
@@ -91,7 +91,7 @@
 
     /**
      * Generate refresh token
-     * @param {Object} payload 
+     * @param {Object} payload
      * @returns {Sring}
      */
     jwtGenerateRefreshToken(payload){

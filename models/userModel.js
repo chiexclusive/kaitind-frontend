@@ -8,16 +8,35 @@
  * 
  */
 
+//Dependencies
+
+const {users, tempUsers} = require("./schemas/user.schema.js");
+
+
 module.exports = class UserModel{
 
-    constructor(){
-        this.users = [
-            {id: 111, email: "chiboy@gmail.com", password: "$2b$10$NsRlGcpQZOW4mPWF87hLKO6u8RO1IyF2juYnN.PBELfIkEDlsc9EG"},
-        ]
+    getUserByEmail(userEmail){
+        return new Promise((resolve, reject) => {
+            return  users.findOne({
+                        email: userEmail
+                    }).exec((err, user) => {
+                        if(err) reject(err);//Log this error
+                        else resolve(user);
+                    })
+        })
     }
 
-    getUserByEmail(email){
-        //Make this to obtained fromo a persistent db 
-        return this.users.find(user=> user.email == email);
+
+    storeTempUser(data, email) {
+        return new Promise((resolve, reject) => {
+            tempUsers.create({email: email, data: data})
+            .then((err, result) => {
+                if(err) return reject(err);
+                return resolve(data);
+            })
+            .catch((err) => reject(err));
+        })
     }
+
+
 }

@@ -12,8 +12,10 @@ const users = express.Router(); //Use router
 const UserController = require("./../controllers/userController.js")//User controller
 const session = require ("express-session");
 const {auth} = require("./../helpers/authorization.js");
-const cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser"); //Cookie parser
+const db = require ("./../helpers/dbConnection.js"); //Get data base connection from helpers
 
+db.connect(); //Start db connection
 
 
 const TWO_DAYS = 2 * 1000 * 60 * 60 * 24 //Duration in milliseconds
@@ -24,8 +26,7 @@ users.use(session({
     resave: false
 })) 
 
-users.use(cookieParser());
-
+users.use(cookieParser()); //Use cookie parser middle ware
 
 //Middle ware to sanitize request body
 users.use("/login", (req, res, next) => {
@@ -39,23 +40,40 @@ users.use((req, res, next) => auth(req, res, next));
 //**Define the routes under users */
 users.post("/login", (req, res) => {
     const user = new UserController(req, res);
-    if(user.validate()){} user.process();
+    user.validate()
+    .then((isValid) => {
+        if(isValid) user.process();
+    })
+    .catch((error) => console.log(error)) //Log this error
 })
 
 users.delete("/logout", auth, (req, res) => {
     const user = new UserController(req, res); 
     user.process();
 })
-module.exports = users;
 
-users.post("/signup/:id", (req, res) => {
-    console.log(params);
-    const user = new UserController(req, res);
-    if(user.validate()) user.process();
-})
 
 users.post("/signup", (req, res) => {
     const user = new UserController(req, res);
-    if(user.validate()) user.process();
+    user.validate()
+    .then((isValid) => {
+        if(isValid) user.process();
+    })
+    .catch((error) => console.log(error)) //Log this error
 })
+
+
+users.post("/signup/:id", (req, res) => {
+    const user = new UserController(req, res);
+    user.validate()
+    .then((isValid) => {
+        if(isValid) user.process();
+    })
+    .catch((error) => console.log(error)) //Log this error
+})
+
+
+module.exports = users;
+
+
 

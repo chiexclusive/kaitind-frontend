@@ -34,9 +34,8 @@ class UserController{
     async validate () {
         //Validate users' login data
         if(this.url == "/login"){
-            if(this.isEmptyBody()) this.res.status(400).send();
             try{ await loginSchema.validateAsync(this.log)}
-            catch(error){this.res.status(400).send(error);}            
+            catch(error){this.res.status(400).send(error); return false;}            
         }
 
 
@@ -44,11 +43,11 @@ class UserController{
         if(this.url == "/signup"){
             //do some validation
             try{ const result = await signUpSchema.validateAsync(this.log)}
-            catch(error){this.res.status(400).send(error)}
+            catch(error){this.res.status(400).send(error); return false;}
         }
 
         //do some other checks
-        return true;
+        return new Promise((resolve, reject) => resolve(true));
     }
 
     async process () {
@@ -61,15 +60,22 @@ class UserController{
         * 
         * Note that token expires every 30 min;
         */
-
+        var model = new UserModel();
         if(this.url == "/login"){
             if(this.req.session.data){
                 this.res.status(400).json({success: false, message: "You are logged in already"});
                 return;
             }
-            const model = new UserModel();
-            const user = model.getUserByEmail(this.log.email);
-            if(Object.keys(user).length == 0) res.status(401).send();
+            
+            let user = await model.getUserByEmail(this.log.email);
+            console.log(user);
+            if(user === null){
+                return this.res.status(404).json({
+                    success : false,
+                    message: "Username or password is incorrect"
+                })
+            }
+ 
             const passwordHash = user.password;
             bcrypt.compare(this.log.password, passwordHash, (err) => {
                 if(err) res.status(401).send();
@@ -77,7 +83,7 @@ class UserController{
                     if (err) res.status(401).send();
                     const payload = data;
                     const auth = new Authorization(this.req, this.res);
-                    const token = auth.jwtGenerateToken(payload, {expiresIn : "30min"});
+                    const token = auth.jwtGenerateToken(payload, process.env.TOKEN_SECRET, {expiresIn : "30min"});
                     console.log(token);
                     const refreshToken = auth.jwtGenerateRefreshToken(payload);
                     this.refreshToken = refreshToken;
@@ -106,9 +112,29 @@ class UserController{
          *
          */
         if(this.url == "/signup"){
-            const model = new UserModel();
-            if(model.emailExist()){}
-            const token = jwt.sign(payload, process.env.SIGNIN_TOKEN_SECRET, {expiresIn : "30min"});
+            //Check if a token came with the request
+            //If token exist then used token to validate user 
+            //Store finally to the database
+            if(Object.keys(this.req.params).length !== 0){
+                console.log(this.req.params)
+            }else{
+                if(!this.isAdminRequest(this.req)) return this.res.status(403).send(); //Check if this request is from the admin
+                const user = await model.getUserByEmail(this.log.email);
+                if(user !== null) {res.status(400).json({success: false, message: "User exist already"}); return;}
+                const salt = await bcrypt.genSalt(64); //Server generated salt for user verification
+                const payload = {email: this.log.email, salt: salt};
+                const jwt = new Authorization();
+                const token = jwt.jwtGenerateToken(payload, process.env.SIGNUP_TOKEN, {expiresIn : "30min"});
+                const sender = new Mailer();//Send verification token to email
+                sender.send(process.env.ENGINE_NAME, this.log.email, getEmailVerificationHTML)
+                .then(() => {
+                    //Store user to temportal collection
+                    model.storeTempUser(JSON.stringify(this.log), this.log.email)
+                    .then((result) => {console.log(result)})
+                    .catch(err => console.log(err)); 
+                })
+                .catch(() => this.res.status(500).send());
+            }
         }
 
 
@@ -128,6 +154,17 @@ class UserController{
             .then(() => this.res.status(200).json({success: true, message: "User is logged out successfully"}))
             .catch((suspect) => this.res.status(400).send(suspect))
         }
+    }
+
+    
+    /**
+     * @param {Object} //Request object
+     * @returns {Boolean}
+     */
+    isAdminRequest(){
+        if((!"access_key" in this.log) || this.log.access_key == "") return false;
+        if(process.env.ADMIN_ACCESS_KEY !== this.log.access_key) return false;
+        return true;
     }
 
 

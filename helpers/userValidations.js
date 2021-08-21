@@ -19,12 +19,12 @@ const loginSchema = Joi.object({
 })
 
 const signUpSchema = Joi.object({
-    firstName: Joi.string().lowercase().required(),
-    lastName: Joi.string().lowercase().required(),
+    first_name: Joi.string().lowercase().required(),
+    last_name: Joi.string().lowercase().required(),
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().alphanum().min(6).required(),
-    refPassword: Joi.string().alphanum().min(6).required(),
-    accessKey: Joi.number().required()
+    ref_password: Joi.string().alphanum().min(6).required(),
+    access_key: Joi.number().required()
 })
 
 
