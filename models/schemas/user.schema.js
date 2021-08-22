@@ -12,11 +12,11 @@
  //Design schema
  //Schema for users
  const usersSchema = new Schema({
-    firstname: {
+    first_name: {
         type: String,
         required: true
     },
-    lastname: {
+    last_name: {
         type: String,
         required: true
     },
@@ -34,6 +34,14 @@
 //Schema for temporal users
  const tempUsersSchema = new Schema({
      email: {
+         type: String,
+         required: true
+     },
+     salt: {
+        type: String,
+        required: true
+     },
+     token: {
          type: String,
          required: true
      },

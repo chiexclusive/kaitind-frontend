@@ -15,6 +15,7 @@
  const NOT_AUTH_ROUTE = [
     "/login",
     "/signup",
+    "/signup/verify"
  ];
 
  
@@ -142,7 +143,7 @@ function storeCookie (name, data, res){
  * @returns {Boolean}
  */
 function notAuthorizationRoute(req){
-    const result = NOT_AUTH_ROUTE.find(res => res == req.url);
+    const result = NOT_AUTH_ROUTE.find(res => res == req._parsedUrl.pathname);
     if(result) return true;
     return false;
 }

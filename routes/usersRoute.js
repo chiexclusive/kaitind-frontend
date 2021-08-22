@@ -33,7 +33,6 @@ users.use("/login", (req, res, next) => {
     req.body = sanitize(req.body);
     next();
 });
-users.use((req, res, next) => auth(req, res, next));
 
 
 
@@ -53,6 +52,16 @@ users.delete("/logout", auth, (req, res) => {
 })
 
 
+users.get("/signup/verify/:token", (req, res) => {
+    const user = new UserController(req, res);
+    user.validate()
+    .then((isValid) => {
+        if(isValid) user.process();
+    })
+    .catch((error) => console.log(error)) //Log this error
+})
+
+
 users.post("/signup", (req, res) => {
     const user = new UserController(req, res);
     user.validate()
@@ -63,14 +72,7 @@ users.post("/signup", (req, res) => {
 })
 
 
-users.post("/signup/:id", (req, res) => {
-    const user = new UserController(req, res);
-    user.validate()
-    .then((isValid) => {
-        if(isValid) user.process();
-    })
-    .catch((error) => console.log(error)) //Log this error
-})
+users.use((req, res, next) => auth(req, res, next));
 
 
 module.exports = users;

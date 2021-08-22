@@ -10,6 +10,7 @@ const UserModel = require("./../models/userModel.js");//User Database
 const {loginSchema, signUpSchema}= require("./../helpers/userValidations.js");//Validation schemas
 const fs = require("fs"); //File system
 const {Authorization} = require("./../helpers/authorization.js"); //Auth
+const jwt = require("jsonwebtoken");
 
 //Variables
 const REFRESH_TOKEN_STORE = __dirname+"./../token.json";
@@ -24,10 +25,11 @@ class UserController{
      * @param{Object} Response object from http
      */
     constructor(req, res) {
+
         this.res = res;
         this.req = req;
         if(this.req.body) this.log = this.req.body;
-        this.url = req.url; //store url for ref
+        this.url = req._parsedUrl.pathname; //store url for ref
         this.refreshToken = "";// Set initial state of refresh token
     }
 
@@ -60,6 +62,7 @@ class UserController{
         * 
         * Note that token expires every 30 min;
         */
+
         var model = new UserModel();
         if(this.url == "/login"){
             if(this.req.session.data){
@@ -111,31 +114,67 @@ class UserController{
          * (5) Send back a response
          *
          */
+
         if(this.url == "/signup"){
-            //Check if a token came with the request
-            //If token exist then used token to validate user 
-            //Store finally to the database
-            if(Object.keys(this.req.params).length !== 0){
-                console.log(this.req.params)
-            }else{
-                if(!this.isAdminRequest(this.req)) return this.res.status(403).send(); //Check if this request is from the admin
-                const user = await model.getUserByEmail(this.log.email);
-                if(user !== null) {res.status(400).json({success: false, message: "User exist already"}); return;}
-                const salt = await bcrypt.genSalt(64); //Server generated salt for user verification
-                const payload = {email: this.log.email, salt: salt};
-                const jwt = new Authorization();
-                const token = jwt.jwtGenerateToken(payload, process.env.SIGNUP_TOKEN, {expiresIn : "30min"});
-                const sender = new Mailer();//Send verification token to email
-                sender.send(process.env.ENGINE_NAME, this.log.email, getEmailVerificationHTML)
-                .then(() => {
-                    //Store user to temportal collection
-                    model.storeTempUser(JSON.stringify(this.log), this.log.email)
-                    .then((result) => {console.log(result)})
-                    .catch(err => console.log(err)); 
-                })
-                .catch(() => this.res.status(500).send());
+            if(!this.isAdminRequest(this.req)) return this.res.status(403).send(); //Check if this request is from the admin
+            if(await this.userExistInTemp(this.log, model)){
+                const tempToken = await model.getTempUserToken(this.log.email);
+                console.log(await this.tokenIsValid(tempToken.token, process.env.SIGNUP_TOKEN));
+                if(await this.tokenIsValid(tempToken.token, process.env.SIGNUP_TOKEN))  return this.res.status(403).json({success: false, message: "Email exist, Please check mail to complete registration"})
+                else model.removeTempUser(this.log.email);
             }
+            const user = await model.getUserByEmail(this.log.email);
+            if(user !== null) {this.res.status(400).json({success: false, message: "User exist already"}); return;}
+            const salt = await bcrypt.genSalt(64); //Server generated salt for user verification
+            const payload = {email: this.log.email, salt: salt};
+            const jwt = new Authorization();
+            const token = await jwt.jwtGenerateToken(payload, process.env.SIGNUP_TOKEN, {expiresIn : "30min"});
+            //console.log(token);
+            try{
+                const passwordSalt = await bcrypt.genSalt(); //Password salt
+                this.log.password =  await bcrypt.hash(this.log.password, passwordSalt)
+            }catch(e){
+                //Log this errors
+                this.res.send(500).send();
+            }
+            //const sender = new Mailer();//Send verification token to email
+            //sender.send(process.env.ENGINE_NAME, this.log.email, getEmailVerificationHTML)
+            //.then(() => {
+                //Store user to temportal collection
+                model.storeTempUser(this.log.email, salt, token, JSON.stringify(this.log))
+                .then((result) => {this.res.status(201).json({success: true, message: "User successfully created. Check mail to verify email"})})
+                .catch(err => this.res.send(err)); 
+            //})
+            //.catch(() => this.res.status(500).send());
+            
         }
+
+        /**
+         * Verify token 
+         */
+        //Check if a token came with the request
+        //If token exist then used token to validate user 
+        //Store finally to the database
+         if(Object.keys(this.req.params).length !== 0){
+            const token = this.req.params.token;
+            return jwt.verify(token, process.env.SIGNUP_TOKEN, (err, data) => {
+                if(err) return this.res.status(403).send();
+                model.getTempUserByEmailAndSalt(data.email, data.salt)
+                .then((result) => {
+                    const user = JSON.parse(result.data);
+                    model.createUser(user)
+                    .then((res) => {
+                        model.removeTempUser(data.email)
+                        .then(() => {
+                            this.res.status(201).json({success: true, message: "Registration success: Email validated successfully"});
+                        })
+                        .catch((err) => this.res.status(500).send());
+                    })
+                    .catch((err) => this.res.status(400).send());
+                })
+                .catch((err) => this.res.status(400).send())
+            })
+         }
 
 
         if(this.url == "/logout"){
@@ -166,6 +205,35 @@ class UserController{
         if(process.env.ADMIN_ACCESS_KEY !== this.log.access_key) return false;
         return true;
     }
+
+    /**
+     * Is there a valid user in tempusers
+     * @param {Object | User}
+     * @returns {Boolean}
+     */
+    async userExistInTemp(user, model){
+        try{
+            const result = await model.getTempUserByEmail(user.email);
+            if(result === null) return false;
+            else return true;
+        }catch{
+            return false;
+        }
+    }
+
+    /**
+     * Is token valid
+     * @param {String | token}
+     * @param {String | secret}
+     * @return {Boolean | isValid}
+     */
+    async tokenIsValid(token, secret){
+        return jwt.verify(token, secret, (err, data) => {
+            if(err) return false;
+            return true;
+        })
+    }
+
 
 
     //Create user session
