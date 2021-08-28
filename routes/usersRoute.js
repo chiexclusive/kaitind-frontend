@@ -10,21 +10,9 @@ const express = require ("express"); //Express
 const sanitize = require("../helpers/sanitizer.js");//Sanitize helper
 const users = express.Router(); //Use router
 const UserController = require("./../controllers/userController.js")//User controller
-const session = require ("express-session");
 const {auth} = require("./../helpers/authorization.js");
 const cookieParser = require("cookie-parser"); //Cookie parser
-const db = require ("./../helpers/dbConnection.js"); //Get data base connection from helpers
 
-db.connect(); //Start db connection
-
-
-const TWO_DAYS = 2 * 1000 * 60 * 60 * 24 //Duration in milliseconds
-users.use(session({
-    secret: "process.env.SESSION_SECRET", 
-    saveUninitialized: true,
-    cookie: {maxAge: TWO_DAYS},
-    resave: false
-})) 
 
 users.use(cookieParser()); //Use cookie parser middle ware
 

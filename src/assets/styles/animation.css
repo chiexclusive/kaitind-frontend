@@ -1,0 +1,191 @@
+/**CSS Animations**/
+@keyframes come_from_right {
+    from {
+        transform: translateX(100%);
+        opacity: 0.5;
+    }
+
+    to {
+        transform: translateX(0%);
+        opacity: 1
+    }
+}
+
+@keyframes come_from_right_small {
+    from{
+        transform: translateX(-100%);
+        opacity: 0px;
+    }
+
+    to {
+        transform: translateX(0px);
+        opacity: 1px;
+    }
+}
+
+@keyframes bounce{
+    0%{
+        transform: translateY(0px);
+    }
+
+    25% {
+        transform: translateY(5px);
+    }
+
+    50% {
+        transform: translateY(0px);
+    }
+
+    75% {
+        transform: translateY(-5px);
+    }
+
+    100%{
+        transform: translateY(0px);
+    }
+}
+
+
+
+
+
+/**Svg animation*/
+@charset "UTF-8";
+
+.fil0 {
+    fill: rgb(4, 4, 51);
+}
+
+.fil1 {
+    fill: #34306d
+}
+
+.fil4 {
+    fill: #34306d
+}
+
+.fil5 {
+    fill: #98989D
+}
+
+.fil3 {
+    fill: #D8A5A7
+}
+
+.fil6 {
+    fill: #EDB6B8
+}
+
+.fil2 {
+    fill: #FAFAFE
+}
+
+.fil7 {
+    fill: white
+}
+
+
+#left-hand {
+    animation: rotateHand 10s ease-in-out infinite reverse;
+    transform-box: fill-box;
+    transform-origin: bottom;
+}
+
+@keyframes rotateHand {
+    0% {
+        transform: rotateZ(0deg);
+    }
+
+    50% {
+        transform: rotateZ(30deg);
+    }
+
+    50% {
+        transform: rotateZ(30deg);
+    }
+
+    100% {
+        transform: rotateZ(0deg);
+    }
+
+}
+
+#right-hand {
+    animation: rotateHand 10s ease-in-out infinite reverse;
+    transform-box: fill-box;
+    transform-origin: right;
+}
+
+@keyframes rotateHand {
+    0% {
+        transform: rotateZ(0deg);
+    }
+
+    50% {
+        transform: rotateZ(30deg);
+    }
+
+    50% {
+        transform: rotateZ(30deg);
+    }
+
+    100% {
+        transform: rotateZ(0deg);
+    }
+
+}
+
+
+#head {
+    animation: rotateHead 10s ease-in-out infinite reverse;
+    transform-box: fill-box;
+    transform-origin: center;
+    ;
+}
+
+@keyframes rotateHead {
+    0% {
+        transform: rotateZ(0deg);
+    }
+
+    25% {
+        transform: rotateZ(15deg);
+    }
+
+    50% {
+        transform: rotateZ(0deg);
+    }
+
+    75% {
+        transform: rotateZ(-15deg);
+    }
+
+    100% {
+        transform: rotateZ(0deg);
+    }
+
+}
+
+
+
+.svg-container svg {
+    animation: svgBounce 3.8s ease-in-out infinite reverse;
+    transform-box: fill-box;
+    transform-origin: center;
+    ;
+}
+
+@keyframes svgBounce {
+    0% {
+        transform: translateY(5px);
+    }
+
+    50% {
+        transform: translateY(20px);
+    }
+
+    100% {
+        transform: translateY(5px);
+    }
+
+}

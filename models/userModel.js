@@ -27,6 +27,9 @@ module.exports = class UserModel{
     }
 
 
+    
+
+
     storeTempUser(data, email) {
         return new Promise((resolve, reject) => {
             tempUsers.create({email: email, data: data})

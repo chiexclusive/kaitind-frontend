@@ -68,7 +68,6 @@ class UserController{
             }
             
             let user = await model.getUserByEmail(this.log.email);
-            console.log(user);
             if(user === null){
                 return this.res.status(404).json({
                     success : false,
@@ -77,14 +76,14 @@ class UserController{
             }
  
             const passwordHash = user.password;
-            bcrypt.compare(this.log.password, passwordHash, (err) => {
-                if(err) res.status(401).send();
+            bcrypt.compare(this.log.password, passwordHash, (err, data) => {
+                if(err) return this.res.status(401).send();
+                if(data === false) return this.res.status(404).json({success: false, message: "Email or password incorrect"});
                 this.setSession({id: user.id, email: user.email}, (err, data) => {
-                    if (err) res.status(401).send();
+                    if (err) return this.res.status(401).send();
                     const payload = data;
                     const auth = new Authorization(this.req, this.res);
                     const token = auth.jwtGenerateToken(payload, process.env.TOKEN_SECRET, {expiresIn : "30min"});
-                    console.log(token);
                     const refreshToken = auth.jwtGenerateRefreshToken(payload);
                     this.refreshToken = refreshToken;
                     this.storeRefreshToken(user.id, refreshToken);

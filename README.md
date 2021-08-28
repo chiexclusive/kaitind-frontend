@@ -25,6 +25,9 @@ This template will be for Nursery, Primary and Secondary School
 
 
 # Discoveries
-
+1. Staff dashboard will come in handy
+    a. Teaching Staff: Should have access to just the  student in the class
+    b. Admin staff: This staff should have access to all the resouces through the access_keys
+2 To make this work for secondary school teaching staff will have access by subject and not class
 
 # Bugs

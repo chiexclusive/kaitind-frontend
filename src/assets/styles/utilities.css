@@ -1,0 +1,63 @@
+/**CSS Utilites*/
+:root{
+    --primary-color: #3f51b5;
+    --primary-gradient: linear-gradient(to right, var(--primary-color), rgb(38, 10, 102));
+     --primary-reverse-gradient: linear-gradient(to right, rgb(38, 10, 102), var(--primary-color));
+}
+
+
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    /* color: black; */
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    list-style-type: none;
+    text-decoration: none;
+    overflow: hidden;
+}
+
+body{
+    overflow: visible;
+
+}
+
+
+p{
+    margin: 10px 0px;
+}
+
+.container{
+    padding: 0px 15px;
+    margin:10px;
+    width: 100%;
+}
+
+.grid{
+    display: grid;
+}
+
+.flex{
+    display: flex;
+}
+
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3)
+}
+
+.form-control {
+    width: 100%;
+    margin-top: 30px
+}
+
+.center-adjuster{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    margin-top: 2.9px;
+    margin-left: 5px;
+}
