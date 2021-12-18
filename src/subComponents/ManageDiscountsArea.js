@@ -230,6 +230,28 @@ function ManageDiscountsArea (){
 
 	}, [discounts])
 
+	const select = (event) => {
+		var element
+
+		if(event.target.getAttribute("data-type") !== "discount-item" && event.target.nodeName !== "STRONG"){
+			element = event.target.parentElement;
+		}else if(event.target.getAttribute("data-type") !== "discount-item" || event.target.nodeName === "STRONG"){
+			element = event.target.parentElement.parentElement;
+		}
+		else{
+			element = event.target;
+		}
+
+		const id = element.getAttribute("id");
+		const elem = document.getElementById(id).children[1].cloneNode(true);
+		const target = document.querySelector(".discount-selected");
+		target.innerHTML = "";
+		target.appendChild(elem)
+		target.classList.remove("hide")
+		element.classList.remove("discount-active")
+		registerSelection(id);
+	}
+
 
 
 	const hasExpired = (date, expires) => {
@@ -292,9 +314,11 @@ function ManageDiscountsArea (){
 				{
 					JSON.parse(discounts).map((item, index) => {
 						return (
-							<div data-coupon = {item.coupon}  key = {index} id = {item._id} style = {{"background": "orange", "borderRadius": "10px", "cursor": "grab", "userSelect": "none"}} className = "discount-item m-3 col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" draggable = "true" onDragStart = {drag}>
+							<div data-type = "discount-item" data-coupon = {item.coupon}  key = {index} id = {item._id} style = {{"background": "orange", "borderRadius": "10px", "cursor": "grab", "userSelect": "none"}} className = "discount-item m-3 col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" draggable = "true" onDragStart = {drag} onDoubleClick = {select}>
 								<span data-id = {item._id} className = "close" onClick = {deleteDiscounts}>&times;</span>
-								<strong>{item.coupon} <strong style = {{"fontSize": "24px"}}>{item.discount}%</strong></strong>
+								<span style = {{"fontWeight": "bolder"}}>{item.coupon} 
+									<strong style = {{"fontSize": "24px"}}>{item.discount}%</strong>
+								</span>
 								<div style = {{"fontSize": "12px", "marginTop": "-5px"}}>{computeExpires(item.dateCreated, item.expires)}</div>
 							</div>
 						)

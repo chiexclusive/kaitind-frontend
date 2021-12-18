@@ -4,7 +4,7 @@ import {acceptImage} from "./../../utilities/modalUtils.js"
 export default function AdminNewProductModal (props) {
 
 
-	const [file,] = useState("");
+	const [file, setFile] = useState("");
 	const [imageSrc, setImageSrc] = useState("");
 
 	//Form data
@@ -144,10 +144,11 @@ export default function AdminNewProductModal (props) {
 	const validateField = () => {
 		const notRequired = ["tags", "percentageDiscount", "calories", "isOpen"]
 		if(Object.keys(data).length === 0) return {isComplete: false, errorMessage: "Some fields are empty"}
+			console.log(data)
 		for(var field in  data){
-			if(data[field].toString().trim() === "" || (notRequired.find(entry => entry === field)) === undefined || (notRequired.find(entry => entry === field)) === null) return {isComplete: false, errorMessage: `${field} cannot be left empty`}
+			if(data[field].toString().trim() === "" && notRequired.find(entry => entry === field) === undefined) return {isComplete: false, errorMessage: `${field} cannot be left empty`}
 		}
-
+		console.log(field, data[field])
 		if(file === "") return {isComplete: false, errorMessage: "Product requires an image"}
 
 
@@ -176,8 +177,8 @@ export default function AdminNewProductModal (props) {
 
 
 
-	const handleImage = (event, setSrc, setFile) => {
-		acceptImage(event, setSrc, setFile)
+	const handleImage = (event) => {
+		acceptImage(event, setImageSrc, setFile)
 
 	}
 

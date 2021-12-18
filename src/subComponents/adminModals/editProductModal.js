@@ -38,7 +38,7 @@ export default function AdminEditProductModal (props) {
 		setPercentageDiscount(toEdit.percentageDiscount);
 		setTags(toEdit.tags);
 		setIsOpen(toEdit.isOpen);
-		setImageEditSrc(window.BASE_URL+"/frontend/public/storage/images/products/"+toEdit.foodImage);
+		setImageEditSrc(window.BASE_URL+"/storage/images/products/"+toEdit.foodImage);
 		setData({})
 	}, [props.toEdit])
 

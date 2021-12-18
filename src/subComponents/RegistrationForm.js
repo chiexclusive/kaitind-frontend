@@ -115,8 +115,8 @@ export default function RegistrationForm () {
 	return (
 		<div style = {{"background" : "#f2f0f0"}} className = "w-100 h-100 py-3 d-flex justify-content-center align-items-center flex-column w-100">
 			<div className = "bg-white contact-form-card col-sm-12 col-md-6">
-				<div style = {{"margin-bottom": "20px"}}  className = "contact-header-text d-flex justify-content-center flex-column">
-					<div style = {{"margin-bottom": "20px"}}><a href = "/"><h3><strong className = "text-orange">Kaitind</strong></h3></a></div>
+				<div style = {{"marginBottom": "20px"}}  className = "contact-header-text d-flex justify-content-center flex-column">
+					<div style = {{"marginBottom": "20px"}}><a href = "/"><h3><strong className = "text-orange">Kaitind</strong></h3></a></div>
 					<div><h4 className = "text-muted">Register Here</h4></div>
 				</div>
 

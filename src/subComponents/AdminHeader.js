@@ -44,8 +44,10 @@ export default function  AdminHeader (props) {
 			<div className = "d-flex align-items: center"><span>Admin Portal</span></div>
 			<div className = "btn-group">
 				<div className = "dropdown">
-					<span className = "fa fa-user"></span>
-					<span className = "dropdown-toggle" data-toggle = "dropdown"></span>
+					<div data-toggle = "dropdown">
+						<span className = "fa fa-user"></span>
+						<span className = "dropdown-toggle" ></span>
+					</div>
 					<div className = "dropdown-content">
 						<div className = "dropdown-menu">
 							<div style = {{"cursor": "pointer"}} className = "dropdown-item" onClick = {signOutAdmin}><span className = "fa fa-sign-out"></span>Log Out</div>
