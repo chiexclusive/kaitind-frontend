@@ -28,9 +28,3 @@ run.test
 
 #examples
 passportConfig.js
-
-# Client sever
-/src
-/storage
-/public
-
